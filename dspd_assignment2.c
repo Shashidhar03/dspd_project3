@@ -12,16 +12,17 @@
 
 struct Rest_node
 {
-    int restaurant_id;
+    int restaurant_id;            //data
     char address[100];
     char restaurant_area[100];
 	char no_of_seates[100];
 	char special_facilities[100];
-	char menu[5][100];
+	char menu[previous_orders_value][100];
 	char type_of_restarunt[100];
 	char type_of_food[100];
     char near_by_area[3][100];
-    int rest_node_height;
+
+    int rest_node_height;       //for avl tree
     struct Rest_node *rest_left;
     struct Rest_node *rest_right;
 };
@@ -33,8 +34,9 @@ struct Agent_node
 	unsigned long long int agent_phone_no;
 	int commission;
     char agent_area[100];
-    int agent_node_height;
     int agent_status;
+
+    int agent_node_height;
     struct Agent_node *agent_left;
     struct Agent_node *agent_right;
 };
@@ -45,6 +47,7 @@ struct User_node
 	char user_name[100];
 	char user_address[100];
 	long long int user_phone_no;
+
     int user_node_height;
     struct User_node *user_left;
     struct User_node *user_right;
@@ -57,10 +60,12 @@ struct global_order_Node
 	char customer_address[100];
     char customer_area[100];
 	long long int customer_phone_no;
-    char order_menu[max_order_menu_number][100];
-    struct Agent_node* agents_order_ptr; 
-    int global_order_node_height;
+    char order_menu[max_order_menu_number][100]; 
     time_t time_taken;
+
+    struct Agent_node* agents_order_ptr;     //pointer to agent node who is delivering the order
+
+    int global_order_node_height;
     struct global_order_Node* global_order_left;
     struct global_order_Node* global_order_right;
 };
@@ -70,7 +75,7 @@ typedef struct Agent_node agent_node;
 typedef struct User_node user_node;
 typedef struct global_order_Node global_order_node;
 
-int max(int a, int b)
+int maxi(int a, int b)
 {
     int ret_val;
     if(a>b)
@@ -88,7 +93,7 @@ int get_rest_height(rest_node *root)           //gives height of each node
     int ret_val=0;
     if(root!=NULL)
     {
-        ret_val= 1+ max(get_rest_height(root->rest_left),get_rest_height(root->rest_right));
+        ret_val= 1+ maxi(get_rest_height(root->rest_left),get_rest_height(root->rest_right));
     }
     return ret_val;
 }
@@ -166,7 +171,7 @@ rest_node* insert_rest_node(rest_node *root)
 	char *sp;
 	while(fgets(line,1024,fp)!=NULL)
     {
-        rest_node* temp=(rest_node*)malloc(sizeof(rest_node));
+        rest_node* temp=(rest_node*)malloc(sizeof(rest_node));       //we store data from files in temp node and then insert it in tree
 
         sp=strtok(line,",");
         temp->restaurant_id=atoi(sp);
@@ -201,7 +206,7 @@ rest_node* insert_rest_node(rest_node *root)
             strcpy(temp->near_by_area[i],sp);
         }
 
-        root=insert_rest_node_child(root,temp);
+        root=insert_rest_node_child(root,temp);       //inserting node in AVL tree
     }
     fclose(fp);
     return root;
@@ -228,7 +233,7 @@ int get_agent_height(agent_node *root)
     int ret_val=0;
     if(root!=NULL)
     {
-        ret_val=1 + max(get_agent_height(root->agent_left),get_agent_height(root->agent_right));
+        ret_val=1 + maxi(get_agent_height(root->agent_left),get_agent_height(root->agent_right));
     }
     return ret_val;
 }
@@ -306,7 +311,7 @@ agent_node* insert_agent_node(agent_node *root)
     FILE *fp=fopen("agent.csv","r");
     while(fgets(line,1024,fp)!=NULL)
     {
-        agent_node *temp=(agent_node*)malloc(sizeof(agent_node));
+        agent_node *temp=(agent_node*)malloc(sizeof(agent_node));      //reading data from file and storing in node
         
         sp=strtok(line,",");
         temp->agent_id=atoi(sp);
@@ -323,7 +328,7 @@ agent_node* insert_agent_node(agent_node *root)
         sp=strtok(NULL,",");
         strcpy(temp->agent_area,sp);
 
-        root=insert_agent_node_child(root,temp);
+        root=insert_agent_node_child(root,temp);     //inserting node in AVL tree
     }
 
     fclose(fp);
@@ -349,7 +354,7 @@ int get_user_height(user_node *root)
     int ret_val=0;
     if(root!=NULL)
     {
-        ret_val=1 + max(get_user_height(root->user_left),get_user_height(root->user_right));
+        ret_val=1 + maxi(get_user_height(root->user_left),get_user_height(root->user_right));
     }
     return ret_val;
 }
@@ -425,7 +430,7 @@ user_node* insert_user_node(user_node *root)
     FILE *fp=fopen("user.csv","r");
     while(fgets(line,1024,fp)!=NULL)
     {
-        user_node *temp=(user_node*)malloc(sizeof(user_node));
+        user_node *temp=(user_node*)malloc(sizeof(user_node));    //reading data from file and storing in node
         
         sp=strtok(line,",");
         temp->user_id=atoi(sp);
@@ -439,7 +444,7 @@ user_node* insert_user_node(user_node *root)
         sp=strtok(NULL,",");
         temp->user_phone_no=atoi(sp);
 
-        root=insert_user_node_child(root,temp);
+        root=insert_user_node_child(root,temp);          //inserting node in AVL tree
     }
 
     fclose(fp);
@@ -463,7 +468,7 @@ int get_order_node_height(global_order_node *root)
     int ret_val=0;
     if(root!=NULL)
     {
-        ret_val=1 + max(get_order_node_height(root->global_order_left),get_order_node_height(root->global_order_right));
+        ret_val=1 + maxi(get_order_node_height(root->global_order_left),get_order_node_height(root->global_order_right));
     }
     return ret_val;
 }
@@ -519,7 +524,7 @@ global_order_node* insert_order_node_child(global_order_node* root,global_order_
     {
         root=temp;
         root->global_order_node_height=1;
-        root->agents_order_ptr=assign_agent(agent_root);
+        root->agents_order_ptr=assign_agent(agent_root);           //assigning agent to every order
     }
     else if(temp->customer_id<root->customer_id)
     {
@@ -656,6 +661,11 @@ global_order_node* delivery_order(global_order_node* global_root)
     global_order_node *ret_val=global_root;
     global_order_node* prev;
     int flag=0;
+    if(global_root==NULL||global_root->agents_order_ptr==NULL)
+    {
+        printf("no orders are there at present\n");
+        flag=1;
+    }
     while(global_root!=NULL&&flag==0)
     {
         if(global_root->global_order_left!=NULL&&global_root->agents_order_ptr!=NULL)
@@ -691,7 +701,7 @@ global_order_node* delivery_order(global_order_node* global_root)
             xptr->agents_order_ptr->agent_status=0;                      //setting status back to zero(indicates agent is free)
             xptr->agents_order_ptr=NULL;
 
-            if(prev->global_order_left==xptr)
+            if(prev->global_order_left==xptr)       //setting its previous pointers to null,so there can be no dangling pointers
             {
                 prev->global_order_left=NULL;
             }
@@ -715,6 +725,11 @@ global_order_node* cancel_order(global_order_node *global_root)
     int flag=0;
     global_order_node* prev;
     global_order_node *ret_val=global_root;
+    if(global_root==NULL||global_root->agents_order_ptr==NULL)
+    {
+        printf("no orders are there to cancel at present\n");
+        flag=1;
+    }
    while(global_root!=NULL&&flag==0)
    {
         if(global_root->global_order_left!=NULL&&global_root->agents_order_ptr!=NULL)
@@ -1116,118 +1131,124 @@ int main()
     // visit_user(user_root);
 
     global_order_node *global_root=NULL;
-    global_root=insert_global_order_node(global_root,agent_root);
+    // global_root=insert_global_order_node(global_root,agent_root);
     // visit_global_order(global_root,agent_root);
 
-    int match;
-    printf("1.enter 1 to search \n");
-    printf("2.enter 2 to place order\n");
-    printf("3.enter 3 to delivery order\n");
-    printf("4.enter 4 to cancel order\n");
-    printf("5.enter 5 to Find Favorite Foods Of user-id\n");
-    printf("6.enter 6 to Find Favorite Restaurants\n");
-    printf("7.enter 7 to Find Favorite Foods Across Restaurants\n");
-    printf("8.enter 8 to  search \n");
-    printf("9.enter 9 to print agent details\n");
-    printf("10.enter 10 to print live orders\n");
-    printf("11.enter 11 to print area wise agents\n");
-    printf("12.enter 12 to print restaurant details(given restaurant name and address)\n");
-    printf("13.enter 13 to exit\n");
-   scanf("%d",&match);
-
-    if(match==1)
+    int match=-1;
+    while(match!=0)
     {
-        int sub_match;
-        printf("1. enter 1 to search based on category (restaurant, cafe, pub etc) \n");
-        printf("2. enter 1 to search based on category of food(northIndian, southIndian, continental)\n");
-        printf("3. enter 1 to search based on area\n");
-        scanf("%d",&sub_match);
-
-        char to_search[100];
-        if(sub_match==1)
+        printf("\n");
+        printf("1.enter 1 to search \n");
+        printf("2.enter 2 to place order\n");
+        printf("3.enter 3 to delivery order\n");
+        printf("4.enter 4 to cancel order\n");
+        printf("5.enter 5 to Find Favorite Foods Of user-id\n");
+        printf("6.enter 6 to Find Favorite Restaurants\n");
+        printf("7.enter 7 to Find Favorite Foods Across Restaurants\n");
+        printf("8.enter 8 to  search \n");
+        printf("9.enter 9 to print agent details\n");
+        printf("10.enter 10 to print live orders\n");
+        printf("11.enter 11 to print area wise agents\n");
+        printf("12.enter 12 to print restaurant details(given restaurant name and address)\n");
+        printf("0.enter 0 to exit\n");
+        scanf("%d",&match);
+        printf("\n");
+        if(match==1)
         {
-            printf("enter the category to search\n");
-            scanf("%s",to_search);
-            search_function(rest_root,to_search);
-        }
-        else if(sub_match==2)
-        {
-            printf("enter the category of food to search\n");
-            scanf("%s",to_search);
-            search_function(rest_root,to_search);
-        }
-        else if(sub_match==3)
-        {
-            printf("enter the area to search\n");
-            scanf("%s",to_search);
-            search_function(rest_root,to_search);
-        }
+            int sub_match;
+            printf("1. enter 1 to search based on category (restaurant, cafe, pub etc) \n");
+            printf("2. enter 1 to search based on category of food(northIndian, southIndian, continental)\n");
+            printf("3. enter 1 to search based on area\n");
+            scanf("%d",&sub_match);
 
+            char to_search[100];
+            if(sub_match==1)
+            {
+                printf("enter the category to search\n");
+                scanf("%s",to_search);
+                search_function(rest_root,to_search);
+            }
+            else if(sub_match==2)
+            {
+                printf("enter the category of food to search\n");
+                scanf("%s",to_search);
+                search_function(rest_root,to_search);
+            }
+            else if(sub_match==3)
+            {
+                printf("enter the area to search\n");
+                scanf("%s",to_search);
+                search_function(rest_root,to_search);
+            }
+
+        }
+        else if(match==2)
+        {
+            printf("ORDER IS PLACED\n");
+            global_root=insert_global_order_node(global_root,agent_root);
+            // visit_global_order(global_root,agent_root);
+        }
+        else if(match==3)
+        {
+            global_root=delivery_order(global_root);
+        }
+        else if(match==4)
+        {
+            global_root=cancel_order(global_root);
+        }
+        else if(match==5)
+        {
+            int search_user_id;
+            printf("enter the user id\n");
+            scanf("%d",&search_user_id);
+            find_favorite_food(global_root,search_user_id);
+        }
+        else if(match==6)
+        {
+            int no_of_days;
+            printf("enter the number of days\n");
+            scanf("%d",&no_of_days);
+            find_favorite_restaurant(global_root,no_of_days);
+        }
+        else if(match==7)
+        {
+            int no_of_days;
+            printf("enter the number of days\n");
+            scanf("%d",&no_of_days);
+            find_favorite_food_across_restaurant(global_root,no_of_days);
+        }
+        else if(match==8)
+        {
+            int min,max;
+            printf("enter the minimum range\n");
+            scanf("%d",&min);
+            printf("enter the maximum range\n");
+            scanf("%d",&max);
+            range_search(global_root,min,max);
+        }
+        else if(match==9)
+        {
+            visit_agent(agent_root);
+        }
+        else if(match==10)
+        {
+            visit_global_order(global_root,agent_root);
+        }
+        else if(match==11)
+        {
+            visit_area_wise_agent(agent_root);
+        }
+        else if(match==12)
+        {
+            char restaurant_name[100],restaurant_address[100];
+            printf("enter restaurant name(area) and address to search\n");
+            scanf("%s",restaurant_name);
+            scanf("%s",restaurant_address);
+            search_with_restaurant_details(rest_root,restaurant_name,restaurant_address);
+        }
     }
-    else if(match==2)
-    {
-        printf("ORDER IS PLACED\n");
-        visit_global_order(global_root,agent_root);
-    }
-    else if(match==3)
-    {
-        global_root=delivery_order(global_root);
-    }
-    else if(match==4)
-    {
-        global_root=cancel_order(global_root);
-    }
-    else if(match==5)
-    {
-        int search_user_id;
-        printf("enter the user id\n");
-        scanf("%d",&search_user_id);
-        find_favorite_food(global_root,search_user_id);
-    }
-    else if(match==6)
-    {
-        int no_of_days;
-        printf("enter the number of days\n");
-        scanf("%d",&no_of_days);
-        find_favorite_restaurant(global_root,no_of_days);
-    }
-    else if(match==7)
-    {
-        int no_of_days;
-        printf("enter the number of days\n");
-        scanf("%d",&no_of_days);
-        find_favorite_food_across_restaurant(global_root,no_of_days);
-    }
-    else if(match==8)
-    {
-        int min,max;
-        printf("enter the minimum range\n");
-        scanf("%d",&min);
-        printf("enter the maximum range\n");
-        scanf("%d",&max);
-        range_search(global_root,min,max);
-    }
-    else if(match==9)
-    {
-        visit_agent(agent_root);
-    }
-    else if(match==10)
-    {
-        visit_global_order(global_root,agent_root);
-    }
-    else if(match==11)
-    {
-        visit_area_wise_agent(agent_root);
-    }
-    else if(match==12)
-    {
-        char restaurant_name[100],restaurant_address[100];
-        printf("enter restaurant name(area) and address to search\n");
-        scanf("%s",restaurant_name);
-        scanf("%s",restaurant_address);
-        search_with_restaurant_details(rest_root,restaurant_name,restaurant_address);
-    }
-    else if(match==13)
+
+    if(match==0)
     {
         printf("exited successfully by freeing all nodes\n");
         free_rest_node(rest_root);
@@ -1235,5 +1256,6 @@ int main()
         free_user_node(user_root);
         free_global_order_node(global_root);
     }
+
     return 0;
 }
